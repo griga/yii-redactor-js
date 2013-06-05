@@ -19,8 +19,6 @@ class UploadedImagesAction  extends CAction
 
 		foreach(new RecursiveIteratorIterator($it) as $file => $splFileObject) {
 			/** @var $splFileObject SplFileObject*/
-
-
 				$files[] = array(
 				'thumb'=> $thumbsUrl . $splFileObject->getFilename(),
 				'image'=> $originalUrl . $splFileObject->getFilename(),

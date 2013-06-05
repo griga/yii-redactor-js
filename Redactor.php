@@ -65,8 +65,6 @@ class Redactor extends CInputWidget
 			$options = array_merge($options, array('iframe'=>true));
 		}
 
-
-
 		$options = CJSON::encode($options);
 		$js = <<<JS
 		$('#{$id}').redactor({$options});
@@ -154,6 +152,22 @@ JS;
 			'editorOptions' => $editorOptions,
 			'htmlOptions' => $htmlOptions,
 		), true);
+	}
+
+	public static function activeTbRedactorWidget($model, $attribute, $editorOptions = array(), $htmlOptions = array())
+	{
+		$out = CHtml::openTag('div', array('class'=>'control-group'));
+		$out .= CHtml::activeLabelEx($model, $attribute, array('class'=>'control-label'));
+		$out .= CHtml::openTag('div', array('class'=>'controls'));
+		$out .= Yii::app()->getController()->widget(__CLASS__, array(
+			'model' => $model,
+			'attribute' => $attribute,
+			'editorOptions' => $editorOptions,
+			'htmlOptions' => $htmlOptions,
+		), true);
+		$out .= CHtml::closeTag('div') . CHtml::closeTag('div');
+		return $out;
+
 	}
 
 	public static function simpleRedactorWidget($value, $name, $editorOptions = array(), $htmlOptions = array()){
