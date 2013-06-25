@@ -45,6 +45,8 @@ class Redactor extends CInputWidget
 	 */
 	public $height = '400px';
 
+	public $assetsFolder;
+
 	/**
 	 * Display editor
 	 */
@@ -57,6 +59,10 @@ class Redactor extends CInputWidget
 
 		if (!array_key_exists('style', $this->htmlOptions)) {
 			$this->htmlOptions['style'] = "width:{$this->width};height:{$this->height};";
+		}
+
+		if (!array_key_exists('path', $this->editorOptions)) {
+			$this->editorOptions['path'] = Yii::app()->baseUrl.$this->assetsFolder;
 		}
 
 
@@ -119,6 +125,7 @@ JS;
 		$baseDir = dirname(__FILE__);
 		$assets = Yii::app()->getAssetManager()->publish($baseDir . DIRECTORY_SEPARATOR . 'assets');
 
+		$this->assetsFolder = $assets;
 		// Publish required assets
 		$cs = Yii::app()->getClientScript();
 		/**@var CClientScript $cs */
