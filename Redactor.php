@@ -12,6 +12,7 @@ class Redactor extends CInputWidget
 
     public $externalCss = '';
     public $containerClass = '';
+    public $containerId = '';
 
     /**
      * Editor language
@@ -30,7 +31,9 @@ class Redactor extends CInputWidget
     /**
      * Editor options that will be passed to the editor
      */
-    public $editorOptions = array();
+    public $editorOptions = array(
+        'convertDivs'=>false
+    );
     /**
      * Debug mode
      * Used to publish full js file instead of min version
@@ -76,6 +79,7 @@ class Redactor extends CInputWidget
 		$('#{$id}').redactor({$options});
 		 processIframeRedactor('#{$id}', function(body){
 		 		body.addClass('{$this->getContainerClass()}');
+		 		body.attr('id','{$this->getContainerId()}');
 				body.siblings('head').append('<link rel="stylesheet" href="{$this->getCssUrl()}" type="text/css" />');
 			}
 		 )
@@ -108,11 +112,25 @@ JS;
 
     /**
      * Returns container class if it exist in editor options
+     * Use it to add css class to iframe body element of editor
      * @return string $class
      */
     public function getContainerClass(){
         if (array_key_exists('containerClass', $this->editorOptions)){
             return $this->editorOptions['containerClass'];
+        }else {
+            return '';
+        }
+    }
+
+    /**
+     * Returns container id if it exist in editor options
+     * Use it to add id attribute to iframe body element of editor
+     * @return string $class
+     */
+    public function getContainerId(){
+        if (array_key_exists('containerId', $this->editorOptions)){
+            return $this->editorOptions['containerId'];
         }else {
             return '';
         }
