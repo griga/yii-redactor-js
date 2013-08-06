@@ -18,7 +18,7 @@ class Redactor extends CInputWidget
      * Editor language
      * Supports: de, en, fr, lv, pl, pt_br, ru, ua
      */
-    public $lang = 'ru';
+    public $lang = 'en';
     /**
      * Editor toolbar
      * Supports: default, mini
@@ -150,7 +150,7 @@ JS;
 
         $jsFile = $this->debugMode ? 'redactor.js' : 'redactor.min.js';
         $cs->registerScriptFile($assets . '/' . $jsFile);
-        $cs->registerCssFile($assets . '/css/redactor.css');
+        $cs->registerCssFile($assets . '/redactor.css');
         $js = <<<JS
 		function processIframeRedactor(selector, callback) {
 			var body = $('body', $(selector).siblings('iframe').contents());
