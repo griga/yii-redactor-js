@@ -13,7 +13,7 @@ class UploadedImagesAction  extends CAction
 		$dir = Yii::app()->redactor->thumbsPath;
 		$files = array();
 
-		$it = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS);
+		$it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::FOLLOW_SYMLINKS);
 		$thumbsUrl = Yii::app()->redactor->thumbsUrl;
 		$originalUrl = Yii::app()->redactor->originalUrl;
 

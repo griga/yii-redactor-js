@@ -22,8 +22,11 @@ class ImageUploadAction extends CAction
             echo CJavaScript::jsonEncode(array(
                 'filelink' => Yii::app()->redactor->originalUrl . $result['filename']
             ));
+        } else {
+            echo CJavaScript::jsonEncode(array(
+                'error' => $result
+            ));
         }
-
 
 
         Yii::app()->end();

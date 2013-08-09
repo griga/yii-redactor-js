@@ -31,9 +31,7 @@ class Redactor extends CInputWidget
     /**
      * Editor options that will be passed to the editor
      */
-    public $editorOptions = array(
-        'convertDivs'=>false
-    );
+    public $editorOptions = array();
     /**
      * Debug mode
      * Used to publish full js file instead of min version
@@ -46,7 +44,7 @@ class Redactor extends CInputWidget
     /**
      * Editor height
      */
-    public $height = '400px';
+    public $height;
 
     public $assetsFolder;
 
@@ -60,10 +58,6 @@ class Redactor extends CInputWidget
 
         $this->htmlOptions['id'] = $id;
 
-        if (!array_key_exists('style', $this->htmlOptions)) {
-            $this->htmlOptions['style'] = "width:{$this->width};height:{$this->height};";
-        }
-
         if (!array_key_exists('path', $this->editorOptions)) {
             $this->editorOptions['path'] = Yii::app()->baseUrl.$this->assetsFolder;
         }
@@ -74,7 +68,7 @@ class Redactor extends CInputWidget
             $options = array_merge($options, array('iframe'=>true));
         }
 
-        $options = CJSON::encode($options);
+        $options = CJavaScript::encode($options);
         $js = <<<JS
 		$('#{$id}').redactor({$options});
 		 processIframeRedactor('#{$id}', function(body){
@@ -150,6 +144,9 @@ JS;
 
         $jsFile = $this->debugMode ? 'redactor.js' : 'redactor.min.js';
         $cs->registerScriptFile($assets . '/' . $jsFile);
+        $cs->registerScriptFile($assets . '/plugins/clips/clips.js');
+        $cs->registerCssFile($assets . '/plugins/clips/clips.css');
+        $cs->registerScriptFile('/js/redactor/cineversum.js');
         $cs->registerCssFile($assets . '/redactor.css');
         $js = <<<JS
 		function processIframeRedactor(selector, callback) {
@@ -202,6 +199,26 @@ JS;
             'editorOptions' => $editorOptions,
             'htmlOptions' => $htmlOptions,
         ), true);
+    }
+
+    public static function getDefaults(){
+        return array(
+            'minHeight'=>200,
+            'toolbarFixed'=>false,
+            'pastePlainText' => true,
+            'paragraphy' => false,
+            'convertDivs' => false,
+            'linebreaks'=>true,
+            'externalCss' => '/css/style.css?' . time(),
+            'containerClass' => 'row content',
+            'plugins' => array('cineversum'),
+            'imageGetJson' => Yii::app()->controller->createUrl('upload/getUploadedImages'),
+            'imageUpload' => Yii::app()->controller->createUrl('upload/imageUpload'),
+        );
+    }
+
+    public static function mergeWithDefaults($array){
+        return CMap::mergeArray(self::getDefaults(), $array);
     }
 
 

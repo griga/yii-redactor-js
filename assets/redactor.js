@@ -1152,7 +1152,7 @@
 				}
 
 				var frag = this.extractContent();
-
+console.log(frag)
 				setTimeout($.proxy(function()
 				{
 					var pastedFrag = this.extractContent();
