@@ -144,9 +144,6 @@ JS;
 
         $jsFile = $this->debugMode ? 'redactor.js' : 'redactor.min.js';
         $cs->registerScriptFile($assets . '/' . $jsFile);
-        $cs->registerScriptFile($assets . '/plugins/clips/clips.js');
-        $cs->registerCssFile($assets . '/plugins/clips/clips.css');
-        $cs->registerScriptFile('/js/redactor/cineversum.js');
         $cs->registerCssFile($assets . '/redactor.css');
         $js = <<<JS
 		function processIframeRedactor(selector, callback) {
@@ -211,7 +208,6 @@ JS;
             'linebreaks'=>true,
             'externalCss' => '/css/style.css?' . time(),
             'containerClass' => 'row content',
-            'plugins' => array('cineversum'),
             'imageGetJson' => Yii::app()->controller->createUrl('upload/getUploadedImages'),
             'imageUpload' => Yii::app()->controller->createUrl('upload/imageUpload'),
         );
