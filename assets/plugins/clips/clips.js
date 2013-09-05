@@ -20,7 +20,7 @@ RedactorPlugins.clips = {
 
 		}, this );
 
-		this.buttonAdd('clips', 'Clips', function(e)
+		this.buttonAdd('clips', 'Заготовки', function(e)
 		{
 			this.modalInit('Clips', '#clipsmodal', 500, callback);
 		});
@@ -28,7 +28,7 @@ RedactorPlugins.clips = {
 	insertClip: function(html)
 	{
 		this.selectionRestore();
-		this.insertHtml($.trim(html));
+		this.insertHtmlAdvanced($.trim(html));
 		this.modalClose();
 	}
 };

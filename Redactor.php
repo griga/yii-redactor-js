@@ -11,8 +11,6 @@ class Redactor extends CInputWidget
     public $attribute;
 
     public $externalCss = '';
-    public $containerClass = '';
-    public $containerId = '';
 
     /**
      * Editor language
@@ -62,18 +60,15 @@ class Redactor extends CInputWidget
             $this->editorOptions['path'] = Yii::app()->baseUrl.$this->assetsFolder;
         }
 
-
-        $options = array_merge($this->editorOptions, array('lang' => $this->lang, 'toolbar' => $this->toolbar));
-        if(array_key_exists('externalCss', $this->editorOptions)){
-            $options = array_merge($options, array('iframe'=>true));
-        }
-
-        $options = CJavaScript::encode($options);
+        $this->editorOptions = CMap::mergeArray($this->getDefaults(), $this->editorOptions);
+        $containerId = $this->getContainerId();
+        $containerClass = $this->getContainerClass();
+        $options = CJavaScript::encode($this->editorOptions);
         $js = <<<JS
 		$('#{$id}').redactor({$options});
 		 processIframeRedactor('#{$id}', function(body){
-		 		body.addClass('{$this->getContainerClass()}');
-		 		body.attr('id','{$this->getContainerId()}');
+		 		body.addClass('$containerClass');
+		 		body.closest('html').attr('id','$containerId');
 				body.siblings('head').append('<link rel="stylesheet" href="{$this->getCssUrl()}" type="text/css" />');
 			}
 		 )
@@ -111,7 +106,9 @@ JS;
      */
     public function getContainerClass(){
         if (array_key_exists('containerClass', $this->editorOptions)){
-            return $this->editorOptions['containerClass'];
+            $return = $this->editorOptions['containerClass'];
+            unset($this->editorOptions['containerClass']);
+            return $return;
         }else {
             return '';
         }
@@ -124,27 +121,32 @@ JS;
      */
     public function getContainerId(){
         if (array_key_exists('containerId', $this->editorOptions)){
-            return $this->editorOptions['containerId'];
+            $return = $this->editorOptions['containerId'];
+            unset($this->editorOptions['containerId']);
+            return $return;
         }else {
             return '';
         }
     }
 
+    public static $clipsRendered = false;
     public function init()
     {
+        if (!self::$clipsRendered){
+            require_once(__DIR__.'/clips.php');
+            self::$clipsRendered = true;
+        }
         parent::init();
-        // Get assets dir
-        $baseDir = dirname(__FILE__);
-        $assets = Yii::app()->getAssetManager()->publish($baseDir . DIRECTORY_SEPARATOR . 'assets');
-
+        $assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'assets');
         $this->assetsFolder = $assets;
-        // Publish required assets
-        $cs = Yii::app()->getClientScript();
-        /**@var CClientScript $cs */
 
         $jsFile = $this->debugMode ? 'redactor.js' : 'redactor.min.js';
-        $cs->registerScriptFile($assets . '/' . $jsFile);
-        $cs->registerCssFile($assets . '/redactor.css');
+        cs()->registerScriptFile($assets . '/' . $jsFile);
+        cs()->registerScriptFile('/js/redactor.mcmed.js');
+        cs()->registerCssFile($assets . '/redactor.css');
+        cs()->registerScriptFile('/js/redactor.clips.js');
+        cs()->registerScriptFile($assets . '/lang/ru.js');
+        cs()->registerCssFile($assets . '/plugins/clips/clips.css');
         $js = <<<JS
 		function processIframeRedactor(selector, callback) {
 			var body = $('body', $(selector).siblings('iframe').contents());
@@ -155,16 +157,16 @@ JS;
 			  return;
 			}
 			callback(body);
-
 		  }
 JS;
-        $cs->registerScript('redactorJsStuff',$js, CClientScript::POS_READY);
+        cs()->registerScript('redactorJsStuff',$js, CClientScript::POS_READY);
     }
 
 
 
     public static function activeRedactorWidget($model, $attribute, $editorOptions = array(), $htmlOptions = array())
     {
+        $model->$attribute = $model->$attribute ? $model->$attribute : '<div>&nbsp;<br><div>';
         return Yii::app()->getController()->widget(__CLASS__, array(
             'model' => $model,
             'attribute' => $attribute,
@@ -175,6 +177,7 @@ JS;
 
     public static function activeTbRedactorWidget($model, $attribute, $editorOptions = array(), $htmlOptions = array())
     {
+        $model->$attribute = $model->$attribute ? $model->$attribute : '<div>&nbsp;<br><div>';
         $out = CHtml::openTag('div', array('class'=>'control-group'));
         $out .= CHtml::activeLabelEx($model, $attribute, array('class'=>'control-label'));
         $out .= CHtml::openTag('div', array('class'=>'controls'));
@@ -198,18 +201,26 @@ JS;
         ), true);
     }
 
-    public static function getDefaults(){
+    public function getDefaults(){
         return array(
             'minHeight'=>200,
             'toolbarFixed'=>false,
-            'pastePlainText' => true,
+            'pastePlainText' => false,
             'paragraphy' => false,
+            'removeEmptyTags'=>false,
             'convertDivs' => false,
             'linebreaks'=>true,
-            'externalCss' => '/css/style.css?' . time(),
-            'containerClass' => 'row content',
+            'externalCss' => '/css/layout.css?' . time(),
+            'iframe'=>true,
+            'italicTag'=>'i',
+            'containerClass' => 'page-content',
+            'containerId'=>'content',
             'imageGetJson' => Yii::app()->controller->createUrl('upload/getUploadedImages'),
             'imageUpload' => Yii::app()->controller->createUrl('upload/imageUpload'),
+            'lang' => 'ru',
+            'toolbar' => 'default',
+            'plugins' =>array('mcmed'),
+            'formattingTags' =>array('p', 'blockquote', 'h1', 'h2','h3'),
         );
     }
 
